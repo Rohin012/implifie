@@ -1,125 +1,25 @@
 <template>
-    <div class="grid grid-cols-2 gap-4">
-      <div>
-      
-        <Textinput label="First Name" classInput="w-full" v-model="contacts.first_name" />
-        <Textinput label="Last Name" classInput="w-full" v-model="contacts.last_name" />
-        <Textinput label="Email" classInput="w-full" v-model="contacts.email" />
-        <Textinput label="Phone" classInput="w-full" v-model="contacts.phone" />
-        <Button
-          v-if="!isNew"
-          text="Save Changes"
-          btnClass="btn-dark w-1/3 justify-self-end"
-          class="col-span-2"
-          :class="`${!isProfileUpdated() ? ' opacity-40 cursor-not-allowed' : ''}`"
-          :disabled="!isProfileUpdated()"
-          @click="updateContact"
-        />
-      </div>
-      <Button
-        v-if="isNew"
-        text="Create New Business"
-        btnClass="btn-dark w-1/3 justify-self-end"
-        class="col-span-2"
-        @click="createContact"
-      />
-    </div>
-  </template>
-  
-  <script>
-  import Textinput from "@/components/Textinput";
-  import Textarea from "@/components/Textarea";
-  import VueSelect from "@/components/Select/VueSelect";
-  import Button from "@/components/Button";
-  import { useContactStore } from "@/store/contact";
-  
-  export default {
-    components: {
-      Textinput,
-      Textarea,
-      VueSelect,
-      Button,
-    },
-    data() {
-      return {
-        contacts: {
-          id:"",
-          first_name:"",
-          last_name:"",
-          phone:"",
-          email:""
-          
-        },
-        isNew: false,
-      };
-    },
-    computed: {
-      isProfileUpdated() {
-        return () => {
-          const contactStore = useContactStore();
-          const contactData = contactStore.contacts;
-          const contact = this.contacts;
-  
-          return (
-            contact.id !== contactData.id ||
-            contact.first_name !== contactData.first_name ||
-            contact.last_name !== contactData.last_name ||
-            contact.email !== contactData.email ||
-            contact.phone !== contactData.phone
-          );
-        };
-      },
-    },
-    methods: {
-      async updateContact() {
-        console.log(this.updateContact);
-        const contactStore = useContactStore();
-        await contactStore.updateContact(this.contacts);
-        this.showModal=false;
-      },
-  
-      async createContact() {
-        const contactStore = useContactStore();
-       console.log(contactStore)
-        await contactStore.createContact(this.contacts);
-      },
-    },
-    created() {
-    const contactStore = useContactStore();
-  
-    if (!this.isNew) {
-      const contactId = this.$route.params.id; // Assuming you are using Vue Router and the ID is part of the route params
-      const contactData = contactStore.fetchContactId(contactId) // Adjust this based on your store implementation
-        console.log("contactId",contactId)
-        console.log("contactData",contactData)
-      if (contactData) {
-        this.contacts = {
-          id:contactData.id,
-          first_name: contactData.first_name,
-          last_name: contactData.last_name,
-          phone: contactData.phone,
-          email: contactData.email,
-        };
-  
-        Object.entries(this.contacts).forEach(([field, value]) => {
-          console.log(`${field}: ${value}`);
-        });
-        console.log('updatecontact',this.contacts);
-      } else {
-        console.error(`Contact with ID ${contactId} not found.`);
-      }
-    }
-  },
-  
-  }
-  </script><template>
   <div class="grid grid-cols-2 gap-4">
+    <div >
+      <div class="mb-4">
+      <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
+      <input type="text" id="first_name" name="first_name" v-model="contacts.first_name" class="mt-1 p-2 w-full border rounded-md">
+    </div>
+
+    <div class="mb-4">
+      <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
+      <input type="text" id="last_name" name="last_name" v-model="contacts.last_name" class="mt-1 p-2 w-full border rounded-md">
+    </div>
+
+    <div class="mb-4">
+      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+      <input type="email" id="email" name="email" v-model="contacts.email" class="mt-1 p-2 w-full border rounded-md">
+    </div>
+
     <div>
-    
-      <Textinput label="First Name" classInput="w-full" v-model="contacts.first_name" />
-      <Textinput label="Last Name" classInput="w-full" v-model="contacts.last_name" />
-      <Textinput label="Email" classInput="w-full" v-model="contacts.email" />
-      <Textinput label="Phone" classInput="w-full" v-model="contacts.phone" />
+      <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+      <input type="tel" id="phone" name="phone" v-model="contacts.phone" class="mt-1 p-2 w-full border rounded-md">
+    </div>
       <Button
         v-if="!isNew"
         text="Save Changes"
@@ -129,7 +29,9 @@
         :disabled="!isProfileUpdated()"
         @click="updateContact"
       />
+   
     </div>
+    
     <Button
       v-if="isNew"
       text="Create New Business"
@@ -138,6 +40,7 @@
       @click="createContact"
     />
   </div>
+  
 </template>
 
 <script>
@@ -147,6 +50,7 @@ import VueSelect from "@/components/Select/VueSelect";
 import Button from "@/components/Button";
 import { useContactStore } from "@/store/contact";
 
+
 export default {
   components: {
     Textinput,
@@ -154,76 +58,91 @@ export default {
     VueSelect,
     Button,
   },
+  
   data() {
     return {
       contacts: {
-        id:"",
-        first_name:"",
-        last_name:"",
-        phone:"",
-        email:""
-        
+       
+        first_name: "",
+        last_name: "",
+        phone: "",
+        email: "",
+        id: "",
       },
       isNew: false,
     };
   },
   computed: {
-    isProfileUpdated() {
-      return () => {
-        const contactStore = useContactStore();
-        const contactData = contactStore.contacts;
-        const contact = this.contacts;
-
-        return (
-          contact.id !== contactData.id ||
-          contact.first_name !== contactData.first_name ||
-          contact.last_name !== contactData.last_name ||
-          contact.email !== contactData.email ||
-          contact.phone !== contactData.phone
-        );
-      };
-    },
-  },
-  methods: {
-    async updateContact() {
-      console.log(this.updateContact);
+  isProfileUpdated() {
+    return () => {
       const contactStore = useContactStore();
-      await contactStore.updateContact(this.contacts);
-      this.showModal=false;
-    },
+      const contactData = contactStore.contacts;
+      const contact = this.contacts;
+      console.log(contactData);
 
-    async createContact() {
-      const contactStore = useContactStore();
-     console.log(contactStore)
-      await contactStore.createContact(this.contacts);
-    },
+      return (
+        contact.id === contactData.id &&
+        contact.first_name === contactData.first_name &&
+        contact.last_name === contactData.last_name &&
+        contact.email === contactData.email &&
+        contact.phone === contactData.phone
+      );
+    };
   },
-  created() {
-  const contactStore = useContactStore();
-
-  if (!this.isNew) {
-    const contactId = this.$route.params.id; // Assuming you are using Vue Router and the ID is part of the route params
-    const contactData = contactStore.fetchContactId(contactId) // Adjust this based on your store implementation
-      console.log("contactId",contactId)
-      console.log("contactData",contactData)
-    if (contactData) {
-      this.contacts = {
-        id:contactData.id,
-        first_name: contactData.first_name,
-        last_name: contactData.last_name,
-        phone: contactData.phone,
-        email: contactData.email,
-      };
-
-      Object.entries(this.contacts).forEach(([field, value]) => {
-        console.log(`${field}: ${value}`);
-      });
-      console.log('updatecontact',this.contacts);
-    } else {
-      console.error(`Contact with ID ${contactId} not found.`);
-    }
-  }
 },
 
-}
+  methods: {
+    async updateContact() {
+      try {
+        const contactStore = useContactStore();
+
+        // Ensure that contactId is defined
+        if (this.contacts.id) {
+          await contactStore.updateContact(this.contacts);
+          console.log('Contact updated successfully!');
+        } else {
+          console.error('Contact ID is undefined. Unable to update.');
+        }
+      } catch (error) {
+        console.error('Error updating contact:', error);
+      }
+    },
+  },
+  // Inside your component
+created() {
+  const contactStore = useContactStore();
+  const contactId = contactStore.getCurrentContactId();
+  this.fetchAndSetContactDetails(contactId)
+},
+
+methods: {
+  async fetchAndSetContactDetails(contactId) {
+    const contactStore = useContactStore();
+
+    console.log("contactId", contactId);
+    console.log('this.contact',this.contacts)
+    if (!this.isNew && contactId) {
+      try {
+        const contactData = await contactStore.fetchContactId(contactId);
+        console.log("contactData", contactData);
+        console.log("this.contacts",this.contacts)
+        if (contactData) {
+          this.contacts = {
+            id: contactData.id,
+            first_name: contactData.first_name,
+            last_name: contactData.last_name,
+            phone: contactData.phone,
+            email: contactData.email,
+          };
+        } else {
+          console.error(`Contact with ID ${contactId} not found.`);
+        }
+      } catch (error) {
+        console.error(`Error fetching contact with ID ${contactId}:`, error);
+      }
+    }
+  },
+},
+
+};
 </script>
