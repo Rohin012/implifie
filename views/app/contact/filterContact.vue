@@ -13,24 +13,26 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useContactStore } from '@/store/contact';
 
 export default {
   setup() {
     const contactStore = useContactStore();
-    const selectedLastContacted = ref('7'); // Default value as a ref
-    const contacts = ref([]);
+    const state = reactive({
+      selectedLastContacted: '7', // Default value
+      contacts: [],
+    });
 
     onMounted(async () => {
       await contactStore.fetchContact();
-      contacts.value = contactStore.contacts;
+      state.contacts = contactStore.contacts;
     });
 
     const filteredContacts = () => {
       const currentDate = new Date();
-      const selectedDays = parseInt(selectedLastContacted);
-      const filtered = contacts.value.filter(contact => {
+      const selectedDays = parseInt(state.selectedLastContacted);
+      const filtered = state.contacts.filter(contact => {
         const lastContactedDate = new Date(contact.lastmessageDate + ' ' + contact.lastmessageTime);
         const timeDifference = currentDate.getTime() - lastContactedDate.getTime();
         const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
@@ -38,13 +40,12 @@ export default {
         return daysDifference <= selectedDays;
       });
 
-      console.log(filtered);
       // Update your contacts value with the filtered array
-      // You can assign it to contacts.value if needed
+      state.contacts = filtered;
     };
 
     return {
-      selectedLastContacted,
+      ...state,
       filteredContacts,
     };
   },
