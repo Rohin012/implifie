@@ -25,9 +25,9 @@
                 </template>
               </div>
             </span>
-            <span v-if="props.column.field == 'lastmessageDate'">
+            
               
-            </span>
+           
             <span v-if="props.column.field == 'lastmessageTime'" class="text-slate-500 dark:text-slate-300">
               
               {{ props.row.lastmessageDate }} {{ props.row.lastmessageTime }}
@@ -73,7 +73,7 @@
              :activeModal="showModal"
              @close="closeUpdate()"
               title="Edit Profile">
-              <contactProfile :contacts="contacts" />
+              <contactProfile :contact="contacts" />
                </Modal>
 </template>
 <script>
@@ -109,8 +109,8 @@ export default {
       current: 1,
       perpage: 10,
       pageRange: 10,
-      // id:"",
-      // showModal:"",
+      contactId:ref(""),
+      showModal:false,
       
       actions: [
         {
@@ -188,62 +188,73 @@ export default {
 
     this.contacts = contactStore.contacts;
     this.updateSequence();
-
+    console.log("this.contacts" , this.contacts)
 
   },
   setup() {
     const isSkeletion = ref(true);
-    let handleActionClick = ref(true);
-    const showModal = ref(false);
+    //let handleActionClick = ref(true);
+    //const showModal = ref(false);
     const contactStore = useContactStore();
-    const contacts = ref([]);
-    const id = ref("")
+   const contacts = ref([]);
+    //const id = ref("")
+    //const { deleteContact } = useContactStore()
 
-     handleActionClick = (item, contact) => {
-      console.log('Contact:', contact);
-
-      if (contact && item.name === 'Edit') {
-        showModal.value = true;
-        id.value = contact.id; // Pass the contact id to the modal
-      } else if (item.name === 'delete') {
-        // Handle delete action
-      } else {
-        // Handle other actions
-      }
-    }
+   
+    // const handleView = (contacts) => {
+      
+    //   this.$router.push({ name: "project-details", params: { id: contacts.id } });
+    // };
 
     
-    
+   
+
 
     onMounted(async() => {
-      setTimeout(() => {
-        isSkeletion.value = false;
-      }, 1000);
+  setTimeout(() => {
+    isSkeletion.value = false;
+  }, 1000);
 
-      if (contactStore.contacts.length === 0) {
-        await contactStore.fetchContactId();
-      }
-      
-      contacts.value = contactStore.contacts;
- })
+  if (contactStore.contacts.length === 0) {
+    await contactStore.fetchContactId();
+  }
+
+  contacts.value = contactStore.contacts;
+});
 
 
- const closeUpdate = () => {
-  console.log('Closing modal');
-      showModal.value= false;
-      id.value= ""; // Reset id when closing modal
-    };
+    
     return {
       isSkeletion,
-      handleActionClick,
-      showModal,
-      closeUpdate,
-      contacts,
-      id
+      //handleActionClick,
+     // showModal,
+      //closeUpdate,
+      //contacts,
+     // id,
+     // handleView
      // Return isSkeletion in the setup function
     };
   },
-  methods: {  
+  methods: { 
+    handleActionClick(item, contacts) {
+if (contacts && item.name === 'Edit') {
+  this.showModal = true;
+  this.id = contacts.id;
+  console.log("contacts.id", contacts.id);
+  console.log('Contact:', contacts);
+  console.log('showModal:', this.showModal);
+} else if (item.name === 'Delete') {
+  this.deleteContact(contacts.id);
+} else if (item.name === "View") {
+  this.handleView(contacts);
+}
+}, 
+
+ closeUpdate  ()  {
+      console.log('Closing modal');
+       this.showModal= false;
+       this.contactId = ""; // Reset id when closing modal
+     },
     updateSequence() {
       if (this.contacts.length > 0) {
         this.contacts.forEach((contact, index) => {
@@ -252,9 +263,8 @@ export default {
       }
     },
 
-    
-    
-  },
+  
+  },  
  
   }
   
